@@ -1,3 +1,4 @@
+require('dotenv').config();
 const { Telegraf, session } = require('telegraf');
 const startCommand = require('./commands/start');
 const themesHandler = require('./handlers/themes');
@@ -14,4 +15,5 @@ instructionHandler(bot);
 
 bot.launch();
 
-
+process.once('SIGINT', () => bot.stop('SIGINT'));
+process.once('SIGTERM', () => bot.stop('SIGTERM'));

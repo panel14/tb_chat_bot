@@ -1,4 +1,3 @@
-const { message } = require('telegraf/filters');
 const apiService = require('../ApiService/ApiService')
 
 class ThemesService {

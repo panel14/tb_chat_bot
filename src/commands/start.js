@@ -31,6 +31,7 @@ module.exports = async (bot) => {
                 Markup.inlineKeyboard(keyboard)
             );
         } catch (error) {
+            console.log(error)
             await ctx.reply('Произошла ошибка. Пожалуйста, попробуйте позже.');
         }
     });

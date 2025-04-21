@@ -29,5 +29,7 @@ class ApiResponse {
     }
 }
 
-module.exports = ApiResponse;
-module.exports = ApiError;
+module.exports = { 
+    ApiResponse,
+    ApiError
+} ;

@@ -1,6 +1,6 @@
 require('dotenv').config();
 const axios = require('axios');
-const { ApiResponse } = require('./ApiContracts');
+const { ApiResponse } = require('../../contracts/ApiContracts');
 const storage = require('../Storage/StorageFactory')
 
 const httpClient = axios.create({
@@ -11,8 +11,11 @@ const httpClient = axios.create({
 httpClient.interceptors.request.use(
     (config) => {
         const token = storage.getItem('token');
-        if (token)
-            config.headers.Authorization = `Bearer ${token}`
+        if (token) {
+            config.headers.Authorization = token;
+            // config.headers.Authorization = `Bearer ${token}`;
+            // config.headers['x-auth-token'] = token;
+        }       
         return config;
     },
     (error) => {
@@ -25,7 +28,8 @@ httpClient.interceptors.response.use(
         return ApiResponse.success(response.data);
     },
     (error) => {
-        if (error.response) {  
+        // Логируем ошибки
+        if (error.response) {
             return Promise.resolve(
                 ApiResponse.error(
                     error.response.status,

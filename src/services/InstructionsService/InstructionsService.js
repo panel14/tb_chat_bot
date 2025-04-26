@@ -2,9 +2,18 @@ const apiService = require('../ApiService/ApiService')
 
 class InstructionsService {
 
-    async getInstructions() {
-        const data = await apiService.get('/api/instructions');
-        return data;
+    async addInstructionsToTheme(data) {
+        const response = apiService.post('/content/addInstructionToTheme', {
+            authorTgId: data.authorTgId,
+            themeId: data.themeId,
+            instructions: data.instructions.map(i => {
+                return {
+                    typeId: i.typeId,
+                    content: Array.from(i.content)
+                }
+            })
+        });
+        return response;
     }
 }
 

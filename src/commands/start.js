@@ -1,17 +1,23 @@
 const authService = require('../services/AuthService/authService');
 const themes = require('../handlers/themes')
 
-module.exports = async (bot) => {
-    await bot.command('start', async (ctx) => {
-        await authService.login(0);
 
-        ctx.session = {
-            themes: [],
-            currentThemeId: null,
-            contents: {}
-        }
+exports.handleStartCommand = async (ctx) => {
+    const loginResponse = await authService.login(ctx.from.id);
 
-        themes.handleTheme(ctx, null, 'Привет! Я помогу тебе разобраться, как всё устроено. Выбери нужную тему ниже:');
+    ctx.session = {
+        themes: [],
+        currentThemeId: null,
+        contents: {},
+        role: loginResponse.role
+    }
+
+    themes.handleTheme(ctx, null, 'Привет! Я помогу тебе разобраться, как всё устроено. Выбери нужную тему ниже:');
+}
+
+exports.setupStartHandlers = async (bot) => {
+    bot.command('start', async (ctx) => {
+        await this.handleStartCommand(ctx)
     });
 };
 

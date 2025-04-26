@@ -9,9 +9,9 @@ class AuthService {
                 'Content-Type': 'text/plain'
             }
         });
-        storage.setItem('token', response);
+        storage.setItem('token', response.accessToken);
+        return response;
     }
 }
 
 module.exports = new AuthService();
-

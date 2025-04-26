@@ -13,7 +13,6 @@ class ThemesService {
             params.themeId = themeId
         }
         const data = await apiService.get('/content/get', params);
-        console.log(data);
         if (!data)
             throw new NotFoundError('Не удалось получить список тем');
 
@@ -44,10 +43,11 @@ class ThemesService {
     }
 
     async deleteTheme(id) {
-        const params = {
-            themeId: id
-        };
-        const data = await apiService.post('/theme/delete', params);
+        const data = await apiService.post('/theme/deleteById', JSON.stringify(id), {
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
         return data;
     }
 }

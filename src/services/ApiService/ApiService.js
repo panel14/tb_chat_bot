@@ -2,8 +2,11 @@ const httpClient = require('./axios');
 
 class ApiService {
 
-    async get(url, params) {
-        return await httpClient.get(url, { params });
+    async get(url, params = undefined, config = {}) {
+        if (params) {
+            config.params = params
+        }
+        return await httpClient.get(url, config);
     }
 
     async post(url, data = {}, config = {}) {

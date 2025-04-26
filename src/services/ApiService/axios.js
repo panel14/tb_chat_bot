@@ -26,6 +26,7 @@ httpClient.interceptors.response.use(
         return response.data;
     },
     (error) => {
+        console.log(error.response);
         if (error.response) {
             if (error.response?.status == 401 || error.response?.status == 403)
                 return Promise.reject(new AuthenticationError('Ошибка авторизации.', error.response.status));
@@ -40,7 +41,7 @@ httpClient.interceptors.response.use(
                 new ApiError('Ошибка сети: ' + error.message, 500)
             );
         } else {
-            return Promise.resolve(
+            return Promise.reject(
                 new ApiError('Системная ошибка: ' + error.message, error.response?.status ?? 500)
             );
         }

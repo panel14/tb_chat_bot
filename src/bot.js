@@ -2,7 +2,8 @@ require('dotenv').config();
 const { Telegraf, session } = require('telegraf');
 const startCommand = require('./commands/start');
 const themes = require('./handlers/themes');
-const instructionHandler = require('./handlers/instructions')
+const instructionHandler = require('./handlers/instructions');
+const feedback = require('./handlers/feedback');
 
 const errorMiddleware = require('./middlewares/ErrorMiddleware');
 
@@ -14,6 +15,7 @@ bot.use(errorMiddleware);
 // Подключаем обработчики команд
 startCommand(bot);
 
+feedback.setupFeedbackHandlers(bot);
 themes.setupThemesHandlers(bot);
 instructionHandler(bot);
 

@@ -12,6 +12,7 @@ class ThemesService {
         if (themeId) {
             params.themeId = themeId
         }
+
         const data = await apiService.get('/content/get', params);
         if (!data)
             throw new NotFoundError('Не удалось получить список тем');
@@ -22,9 +23,9 @@ class ThemesService {
     async createTheme(createThemeRequest) {
 
         const data = await apiService.post('/theme/create', {
-            themeName: createThemeRequest.themeName, 
-            description: createThemeRequest.description, 
-            parentId: createThemeRequest.parentId, 
+            themeName: createThemeRequest.themeName,
+            description: createThemeRequest.description,
+            parentId: createThemeRequest.parentId,
             accessLevel: createThemeRequest.accessLevel
         });
 
@@ -34,9 +35,9 @@ class ThemesService {
     async updateTheme(updateThemeRequest) {
         const data = await apiService.post('/theme/update', {
             id: updateThemeRequest.id,
-            themeName: updateThemeRequest.themeName, 
-            description: updateThemeRequest.description, 
-            parentId: updateThemeRequest.parentId, 
+            themeName: updateThemeRequest.themeName,
+            description: updateThemeRequest.description,
+            parentId: updateThemeRequest.parentId,
             accessLevel: updateThemeRequest.accessLevel
         });
         return data;

@@ -1,6 +1,6 @@
 const { message } = require('telegraf/filters');
-const {ContentResponse} = require('../../contracts/ThemesContracts');
-const apiService = require('../ApiService/ApiService')
+const apiService = require('../ApiService/ApiService');
+const { NotFoundError } = require('../../middlewares/errors/Errors');
 
 class ThemesService {
 
@@ -12,79 +12,43 @@ class ThemesService {
         if (themeId) {
             params.themeId = themeId
         }
+        const data = await apiService.get('/content/get', params);
+        console.log(data);
+        if (!data)
+            throw new NotFoundError('Не удалось получить список тем');
 
-        const response = await apiService.get('/content/get', params);
-        if (response.isSuccess()) {
-            return {
-                success: true,
-                content: new ContentResponse(
-                    response.data.leaf,
-                    response.data.children,
-                    response.data.instructions,
-                    response.data.description,              
-                )
-            }
-        }
-        return {
-            success: false,
-            message: 'Не удалось получить список тем'
-        }
+        return data;
     }
 
     async createTheme(createThemeRequest) {
-        const params = {
-            createDto: createThemeRequest
-        };
-        const response = await apiService.post('/theme/create', {
+
+        const data = await apiService.post('/theme/create', {
             themeName: createThemeRequest.themeName, 
             description: createThemeRequest.description, 
             parentId: createThemeRequest.parentId, 
             accessLevel: createThemeRequest.accessLevel
         });
-        console.log(response);
-        if (response.isSuccess()) {
-            return { 
-                success: true,
-                createdThemeId: response.data.id
-            }
-        }
-        return {
-            success: false,
-            message: 'Не удалось создать тему'
-        }
+
+        return data;
     }
 
     async updateTheme(updateThemeRequest) {
-        const params = {
-            updateThemeDto: updateThemeRequest
-        };
-        const response = await apiService.post('/theme/update', params);
-        if (response.isSuccess()) {
-            return {
-                success: true
-            }
-        }
-        return {
-            success: false,
-            message: `Не удалось обновить тему ${updateThemeRequest.themeName} (id: ${updateThemeRequest.id})`
-        }
+        const data = await apiService.post('/theme/update', {
+            id: updateThemeRequest.id,
+            themeName: updateThemeRequest.themeName, 
+            description: updateThemeRequest.description, 
+            parentId: updateThemeRequest.parentId, 
+            accessLevel: updateThemeRequest.accessLevel
+        });
+        return data;
     }
 
     async deleteTheme(id) {
         const params = {
             themeId: id
         };
-        const response = await apiService.post('/theme/delete', params);
-        if (response.isSuccess()) {
-            return {
-                success: true
-            }
-        }
-        return {
-            success: false,
-            message: `Не удалось удалить тему (id: ${id})`
-        }
-
+        const data = await apiService.post('/theme/delete', params);
+        return data;
     }
 }
 

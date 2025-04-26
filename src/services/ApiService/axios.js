@@ -1,7 +1,7 @@
 require('dotenv').config();
 const axios = require('axios');
-const { ApiResponse } = require('../../contracts/ApiContracts');
-const storage = require('../Storage/StorageFactory')
+const { ApiError, AuthenticationError } = require('../../middlewares/errors/Errors')
+const storage = require('../Storage/StorageFactory');
 
 const httpClient = axios.create({
     baseURL: process.env.API_BASE_URL,
@@ -13,8 +13,6 @@ httpClient.interceptors.request.use(
         const token = storage.getItem('token');
         if (token) {
             config.headers.Authorization = token;
-            // config.headers.Authorization = `Bearer ${token}`;
-            // config.headers['x-auth-token'] = token;
         }       
         return config;
     },
@@ -25,24 +23,25 @@ httpClient.interceptors.request.use(
 
 httpClient.interceptors.response.use(
     (response) => {
-        return ApiResponse.success(response.data);
+        return response.data;
     },
     (error) => {
-        // Логируем ошибки
         if (error.response) {
-            return Promise.resolve(
-                ApiResponse.error(
-                    error.response.status,
-                     error.response.data?.message || 'Ошибка сервера'
-                    )
+            if (error.response?.status == 401 || error.response?.status == 403)
+                return Promise.reject(new AuthenticationError('Ошибка авторизации.', error.response.status));
+            return Promise.reject(
+                new ApiError(
+                    error.response.data?.message || 'Ошибка сервера.',
+                    error.response.status
+                )
             );
         } else if (error.request) {
-            return Promise.resolve(
-                ApiResponse.error(500, 'Ошибка сети: ' + error.message)
+            return Promise.reject(
+                new ApiError('Ошибка сети: ' + error.message, 500)
             );
         } else {
             return Promise.resolve(
-                ApiResponse.error(500, 'Системная ошибка: ' + error.message)
+                new ApiError('Системная ошибка: ' + error.message, error.response?.status ?? 500)
             );
         }
     }

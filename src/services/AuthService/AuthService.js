@@ -9,11 +9,7 @@ class AuthService {
                 'Content-Type': 'text/plain'
             }
         });
-        if (response.isSuccess()) {
-            storage.setItem('token', response.data);
-            return true;
-        }
-        return false;    
+        storage.setItem('token', response);
     }
 }
 

@@ -3,7 +3,7 @@ const themes = require('../handlers/themes')
 
 module.exports = async (bot) => {
     await bot.command('start', async (ctx) => {
-        await authService.login(0);
+        await authService.login(ctx.from.id);
 
         ctx.session = {
             themes: [],

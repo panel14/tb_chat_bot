@@ -28,7 +28,7 @@ exports.handleTheme = async (ctx, themeId, message = null) => {
         });
     }
 
-    keyboard.push(['Создать новую тему', 'Обновить текущую тему', 'Удалить текущую тему']);
+    keyboard.push(['Создать новую тему', 'Обновить текущую тему', 'Удалить текущую тему'], ['Форма обратной связи']);
 
     const currentTheme = ctx.session.themes.filter(th => th.id == themeId)[0];
     let text = '';
@@ -103,8 +103,8 @@ handleThemeCreateOrUpdateMessage = async (ctx, data) => {
             await themesService.createTheme(
                 {
                     name: data.name,
-                    description: data.description, 
-                    parentId: data.parentId, 
+                    description: data.description,
+                    parentId: data.parentId,
                     accessLevel: data.accessLevel
                 });
             await ctx.reply('Тема успешно создана!');
@@ -114,8 +114,8 @@ handleThemeCreateOrUpdateMessage = async (ctx, data) => {
                 {
                     id: themeId,
                     name: data.name,
-                    description:  data.description,
-                    parentId: data.parentId, 
+                    description: data.description,
+                    parentId: data.parentId,
                     accessLevel: data.accessLevel
                 });
             await ctx.reply('Тема успешно обновлена!');
@@ -155,8 +155,8 @@ exports.setupThemesHandlers = async (bot) => {
         await handleThemeCreateOrUpdate(ctx, 'update');
     })
 
-    bot.on('text', async (ctx) => { 
-        await createOrUpdateThemeDialog(ctx) 
+    bot.on('text', async (ctx) => {
+        await createOrUpdateThemeDialog(ctx)
     });
 
     bot.hears('Удалить текущую тему', async (ctx) => {

@@ -3,14 +3,14 @@ const themes = require('../handlers/themes')
 
 module.exports = async (bot) => {
     await bot.command('start', async (ctx) => {
-        await authService.login(ctx.from.id);
+        const userRole = await authService.login(ctx.from.id);
 
         ctx.session = {
             themes: [],
             currentThemeId: null,
-            contents: {}
+            contents: {},
+            userRole: userRole
         }
-
         themes.handleTheme(ctx, null, 'Привет! Я помогу тебе разобраться, как всё устроено. Выбери нужную тему ниже:');
     });
 };

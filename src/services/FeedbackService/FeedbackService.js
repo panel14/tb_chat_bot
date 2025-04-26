@@ -24,14 +24,19 @@ class QuestionService {
         return response;
     }
 
+    async getForAnswer() {
+        const response = await apiService.get(`${this.baseUrl}/getForAnswer`);
+        return response;
+    }
+
     async answerQuestion(questionId, answer, responderId) {
         const params = {
             questionId,
             answer,
             responderId
         }
-        const response = await apiService.put(`${this.baseUrl}/answer`, params);
-        return response.data;
+        const response = await apiService.post(`${this.baseUrl}/answer`, params);
+        return response;
     }
 }
 

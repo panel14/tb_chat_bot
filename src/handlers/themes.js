@@ -31,8 +31,10 @@ exports.handleTheme = async (ctx, themeId, message = null) => {
             keyboard.push([`Тема: ${theme.themeName}`]);
         });
         
-        if (ctx.session.role === 'ROLE_ADMIN')
+        if (ctx.session.role === 'ROLE_ADMIN') {
             keyboard.push(['Создать новую тему', 'Обновить текущую тему', 'Удалить текущую тему']);
+            keyboard.push(['Форма обратной связи'])
+        }
     }
 
     const currentTheme = ctx.session.themes.filter(th => th.id == themeId)[0];

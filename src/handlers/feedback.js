@@ -130,7 +130,7 @@ exports.setupFeedbackHandlers = (bot) => {
         await themes.handleTheme(ctx, null, 'Вы вернулись в главное меню\n');
     });
 
-    bot.on('text', async (ctx) => {
+    bot.on('text', async (ctx, next) => {
         if (ctx.session?.answeringQuestionId) {
             const response = await questionService.answerQuestion(
                 ctx.session.answeringQuestionId,
@@ -147,5 +147,6 @@ exports.setupFeedbackHandlers = (bot) => {
         } else {
             await handleQuestionCreation(ctx);
         }
+        await next();
     });
 };

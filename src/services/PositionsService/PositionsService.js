@@ -6,23 +6,34 @@ class PositionsService {
     }
 
     async create(text) {
-        const response = apiService.post(`${this.basePath}/create`, `${text}`);
+        const response = apiService.post(`${this.basePath}/create`, `${text}`, {
+            headers: {
+                'Content-Type': 'text/plain'
+            }
+        });
         return response;
     }
 
     async update(id, text) {
         const params = {
             id: id,
-            text: text
+            name: text
         }
 
-        const response = apiService.post(`${this.basePath}/update`, params);
+        const response = apiService.post(`${this.basePath}/update`, params, {
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
         return response;
     }
 
     async delete(id) {
-        console.log('-----------------------------------------', id);
-        const response = apiService.post(`${this.basePath}/delete`, `${id}`);
+        const response = apiService.post(`${this.basePath}/delete`, id, {
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
         return response;
     }
 

@@ -99,10 +99,16 @@ exports.setupPositionsHandlers = (bot) => {
         }
     });
 
+    bot.hears('Вернуться в главное меню', async (ctx) => {
+        if (ctx.session.awaitingPosition) {
+            delete ctx.session.awaitingPosition;
+        }
+        await themes.handleTheme(ctx, null, 'Вы вернулись в главное меню\n');
+    });
+
     bot.action(/^delete_position_(\d+)$/, async (ctx) => {
         const positionId = ctx.match[1];
         const response = await positionsService.delete(positionId);
-        console.log('-----------------------------------------', response);
         if (response) {
             await ctx.reply('Должность успешно удалена!');
         } else {
@@ -135,7 +141,6 @@ exports.setupPositionsHandlers = (bot) => {
             }
 
             if (step === 'name') {
-                console.log('-----------------------------------------', ctx.message.text);
                 const response = data.id
                     ? await positionsService.update(data.id, ctx.message.text)
                     : await positionsService.create(ctx.message.text);
@@ -149,9 +154,5 @@ exports.setupPositionsHandlers = (bot) => {
                 await showPositionsMenu(ctx);
             }
         }
-    });
-
-    bot.hears('Вернуться в главное меню', async (ctx) => {
-        await themes.handleTheme(ctx, null, 'Вы вернулись в главное меню\n');
     });
 };

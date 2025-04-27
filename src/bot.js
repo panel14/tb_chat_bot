@@ -15,8 +15,8 @@ bot.use(errorMiddleware);
 
 startCommand.setupStartHandlers(bot);
 
-positions.setupPositionsHandlers(bot);
 instructions.setupInstructionsHandlers(bot);
+positions.setupPositionsHandlers(bot);
 feedback.setupFeedbackHandlers(bot);
 themes.setupThemesHandlers(bot);
 

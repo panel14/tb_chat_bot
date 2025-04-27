@@ -6,7 +6,7 @@ const handleFeedbackForm = async (ctx) => {
     const feedbackKeyboard = [
         ['Задать вопрос', 'Мои вопросы'],
     ];
-    if (ctx.session.userRole === 'ROLE_ADMIN') {
+    if (ctx.session.role === 'ROLE_ADMIN') {
         feedbackKeyboard.push(['Ответить на вопрос'])
     }
     feedbackKeyboard.push(['Вернуться в главное меню'])

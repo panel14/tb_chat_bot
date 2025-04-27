@@ -4,6 +4,7 @@ const startCommand = require('./commands/start');
 const themes = require('./handlers/themes');
 const instructions = require('./handlers/instructions');
 const feedback = require('./handlers/feedback');
+const positions = require('./handlers/positions');
 
 const errorMiddleware = require('./middlewares/ErrorMiddleware');
 
@@ -14,6 +15,7 @@ bot.use(errorMiddleware);
 
 startCommand.setupStartHandlers(bot);
 
+positions.setupPositionsHandlers(bot);
 instructions.setupInstructionsHandlers(bot);
 feedback.setupFeedbackHandlers(bot);
 themes.setupThemesHandlers(bot);

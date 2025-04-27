@@ -10,44 +10,44 @@ exports.handleTheme = async (ctx, themeId, message = null) => {
 
     if (content.leaf) {
         content.instructions.forEach(instruction => {
-            ctx.session.contents[`${instruction.id}`] = {
+            ctx.contents[`${instruction.id}`] = {
                 content: instruction.content,
-                type: instruction.instructionType.name
+                type: instruction.instructionType.id
             };
-            keyboard.push([`Инструкция ${instruction.id}`]);
+            keyboard.push([Markup.button.callback(content.description, `instruction_${instruction.id}`)]);
         });
-        
-        if (ctx.session.role === 'ROLE_ADMIN')
-            keyboard.push(['Добавить новую инструкцию']);
     }
     else {
         content.children.forEach(theme => {
             ctx.session.themes[theme.id] = {
                 id: theme.id,
                 name: theme.themeName,
-                parentId: themeId,
-                description: content.description
+                parentId: themeId
             }
             keyboard.push([`Тема: ${theme.themeName}`]);
         });
-        
-        if (ctx.session.role === 'ROLE_ADMIN') {
-            keyboard.push(['Создать новую тему', 'Обновить текущую тему', 'Удалить текущую тему']);
-            keyboard.push(['Форма обратной связи'])
-        }
+    }
+
+    keyboard.push(['Создать новую тему', 'Обновить текущую тему', 'Удалить текущую тему']);
+    if (ctx.session.role === 'ROLE_ADMIN') {
+        keyboard.push(['Должности', 'Форма обратной связи']);
+    } else {
+        keyboard.push(['Форма обратной связи']);
     }
 
     const currentTheme = ctx.session.themes.filter(th => th.id == themeId)[0];
-    let text = 'Выберите подтему:';
+    let text = '';
     if (currentTheme) {
         ctx.session.currentThemeId = themeId;
         keyboard.push(['Назад']);
-        text = `${currentTheme.name}:\n${content.description}\n`;
+        text = `${currentTheme.name}:\n\n`;
     }
 
     if (message) text = message;
     await ctx.reply(
-        text, Markup.keyboard(keyboard).resize()
+        `${text}Выберите подтему:`,
+        Markup.keyboard(keyboard)
+            .resize()
     );
 };
 
@@ -85,7 +85,7 @@ createOrUpdateThemeDialog = async (ctx) => {
             break;
 
         case 'accessLevel':
-            if (!ctx.message.text || isNaN(ctx.message.text))
+            if (!ctx.message.text || !tryParseInt(ctx.message.text))
                 throw new ValidationError('Уровень доступа должен быть числом');
             data.accessLevel = parseInt(ctx.message.text);
             ctx.session.themeCreation.step = 'parent';
@@ -93,7 +93,7 @@ createOrUpdateThemeDialog = async (ctx) => {
             break;
 
         case 'parent':
-            if (!ctx.message.text || isNaN(ctx.message.text))
+            if (!ctx.message.text || !tryParseInt(ctx.message.text))
                 throw new ValidationError('ID родителя должен быть числом');
             const id = parseInt(ctx.message.text);
             data.parentId = id == 0 ? null : id;
@@ -107,7 +107,7 @@ handleThemeCreateOrUpdateMessage = async (ctx, data) => {
         case 'create':
             await themesService.createTheme(
                 {
-                    themeName: data.name,
+                    name: data.name,
                     description: data.description,
                     parentId: data.parentId,
                     accessLevel: data.accessLevel
@@ -118,13 +118,12 @@ handleThemeCreateOrUpdateMessage = async (ctx, data) => {
             await themesService.updateTheme(
                 {
                     id: themeId,
-                    themeName: data.name,
+                    name: data.name,
                     description: data.description,
                     parentId: data.parentId,
                     accessLevel: data.accessLevel
                 });
             await ctx.reply('Тема успешно обновлена!');
-            ctx.session.themes.find(th => th.id == themeId).name = data.name;
             break;
     }
     delete ctx.session.themeCreation;
@@ -161,12 +160,11 @@ exports.setupThemesHandlers = async (bot) => {
         await handleThemeCreateOrUpdate(ctx, 'update');
     })
 
-    bot.hears('Удалить текущую тему', async (ctx) => {
-        await handleThemeDelete(ctx);
+    bot.on('text', async (ctx) => {
+        await createOrUpdateThemeDialog(ctx)
     });
 
-    bot.on('text', async (ctx, next) => {
-        await createOrUpdateThemeDialog(ctx);
-        await next();
+    bot.hears('Удалить текущую тему', async (ctx) => {
+        await handleThemeDelete(ctx);
     });
 }

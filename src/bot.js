@@ -18,8 +18,8 @@ bot.use(errorMiddleware);
 startCommand.setupStartHandlers(bot);
 
 instructions.setupInstructionsHandlers(bot);
-positions.setupPositionsHandlers(bot);
 feedback.setupFeedbackHandlers(bot);
+positions.setupPositionsHandlers(bot);
 themes.setupThemesHandlers(bot);
 
 access.setupAccessHandlers(bot);

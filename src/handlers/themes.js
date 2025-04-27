@@ -26,21 +26,12 @@ exports.handleTheme = async (ctx, themeId, message = null) => {
             }
             keyboard.push([`Тема: ${theme.themeName}`]);
         });
-<<<<<<< HEAD
-    }
 
-    keyboard.push(['Создать новую тему', 'Обновить текущую тему', 'Удалить текущую тему']);
-    if (ctx.session.role === 'ROLE_ADMIN') {
-        keyboard.push(['Должности', 'Форма обратной связи']);
-    } else {
-        keyboard.push(['Форма обратной связи']);
-=======
-        
+
         if (ctx.session.role === 'ROLE_ADMIN') {
             keyboard.push(['Создать новую тему', 'Обновить текущую тему', 'Удалить текущую тему']);
-            keyboard.push(['Форма обратной связи', 'Выдача доступа'])
+            keyboard.push(['Должности', 'Выдача доступа', 'Форма обратной связи'])
         }
->>>>>>> a6a6de6f4e64fe4558bc22ddc91727c8055813a7
     }
 
     const currentTheme = ctx.session.themes.filter(th => th.id == themeId)[0];
@@ -113,32 +104,11 @@ handleThemeCreateOrUpdateMessage = async (ctx, data) => {
     const themeId = ctx.session.currentThemeId;
     switch (ctx.session.themeCreation.mode) {
         case 'create':
-<<<<<<< HEAD
-            await themesService.createTheme(
-                {
-                    name: data.name,
-                    description: data.description,
-                    parentId: data.parentId,
-                    accessLevel: data.accessLevel
-                });
-            await ctx.reply('Тема успешно создана!');
-            break;
-        case 'update':
-            await themesService.updateTheme(
-                {
-                    id: themeId,
-                    name: data.name,
-                    description: data.description,
-                    parentId: data.parentId,
-                    accessLevel: data.accessLevel
-                });
-=======
             await themesService.createTheme(data);
             await ctx.reply('Тема успешно создана!');
             break;
         case 'update':
             await themesService.updateTheme(data);
->>>>>>> a6a6de6f4e64fe4558bc22ddc91727c8055813a7
             await ctx.reply('Тема успешно обновлена!');
             break;
     }

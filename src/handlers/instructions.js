@@ -1,45 +1,43 @@
+require('dotenv').config();
 const { Markup } = require('telegraf');
 const apiService = require('../services/ApiService/ApiService');
 const instructionsService = require('../services/InstructionsService/InstructionsService');
 
-const callback_inst_type = {
-    'callback_image': 1,
-    'callback_video': 2
+const handleInstructions = async (ctx) => {
+    ctx.session.contents.forEach(async (content) => {
+        const buffer = Buffer.from(content.content, 'base64');
+        switch (content.type) {
+            case 'TEXT':
+                await ctx.reply(buffer.toString('utf-8'))
+                break;
+    
+            case 'PHOTO':
+                await ctx.replyWithPhoto({
+                    source: buffer
+                });
+                break;
+    
+            case 'VIDEO':
+                await ctx.replyWithVideo({
+                    source: buffer
+                });
+                break;
+    
+            case 'LINK':
+                const url = contentBuffer.toString('utf-8');
+                await ctx.reply('Перейдите по ссылке:',
+                    Markup.inlineKeyboard([Markup.button.url('Открыть', url)])
+                );
+                break;
+    
+            default:
+                await ctx.reply('Неизвестный тип инструкции! Обратитесь в службу поддержки.')
+                break;
+        }
+    });
 }
 
-handleInstruction = async (ctx, instId) => {
-    const content = ctx.session.contents[instId];
-    const buffer = Buffer.from(content.content, 'base64');
-    switch (content.type) {
-        case 'STRING':
-            await ctx.reply(buffer.toString('utf-8'))
-            break;
-
-        case 'PHOTO':
-            await ctx.replyWithPhoto({
-                source: buffer
-            });
-            break;
-
-        case 'VIDEO':
-            await ctx.replyWithVideo({
-                source: buffer
-            });
-            break;
-
-        case 'LINK':
-            const url = contentBuffer.toString('utf-8');
-            await ctx.reply('Перейдите по ссылке:',
-                Markup.inlineKeyboard([Markup.button.url('Открыть', url)])
-            );
-            break;
-
-        default:
-            break;
-    }
-}
-
-handleInstrcutionCreate = async (ctx) => {
+const handleInstrcutionCreate = async (ctx) => {
     if (!ctx.session?.isntructionCreation) {
         ctx.session.isntructionCreation = {
             data: [],
@@ -52,14 +50,48 @@ handleInstrcutionCreate = async (ctx) => {
     await ctx.reply('Создание новой инструкции. Загрузите контент (перетащите изображение или видео):');
 }
 
+const handleInstructionsContent = async (ctx) => {
+    if (!ctx.session.isntructionCreation) return;
+
+    let fileId = 0;
+    let typeId = -1;
+
+    let content = null;
+    if (ctx.message.photo || ctx.message.video) {
+        if (ctx.message.photo) {
+            fileId = ctx.message.photo[ctx.message.photo.length - 1].file_id;
+            typeId = process.env.INSTRUCTIONS_CONTENT_MAPPING_IMAGE;
+        }
+        else if (ctx.message.video) {
+            fileId = ctx.message.video.file_id;
+            typeId = process.env.INSTRUCTIONS_CONTENT_MAPPING_VIDEO;
+        }
+
+        const fileLink = await ctx.telegram.getFileLink(fileId);
+
+        content = await apiService.get(fileLink, null, { responseType: 'arraybuffer' });
+    }
+    else if (ctx.message.text) {
+        typeId = process.env.INSTRUCTIONS_CONTENT_MAPPING_TEXT;
+        content = Buffer.from(ctx.message.text, 'utf-8');
+    }
+    ctx.session.isntructionCreation.data.push({ typeId: typeId, content: content});
+
+    await ctx.reply(`Добавить ещё инструкцию или отправить уже созданные инструкции(${ctx.session.isntructionCreation.data.length})?`,
+        Markup.inlineKeyboard(
+            [Markup.button.callback('Добавить', 'Добавить'),
+            Markup.button.callback('Отправить', 'Отправить')]
+        )
+    );
+} 
+
 exports.setupInstructionsHandlers = async (bot) => {
     
-    bot.hears(/^Инструкция (.+)(:.+)?$/, async (ctx) => {
-        const instId = ctx.match[1];
-        await handleInstruction(ctx, instId);
+    bot.hears('Показать инструкции', async (ctx) => {
+        await handleInstructions(ctx);
     });
 
-    bot.hears('Добавить новую инструкцию', async (ctx) => {
+    bot.hears('Обновить список инструкций', async (ctx) => {
         await handleInstrcutionCreate(ctx);
     });
 
@@ -81,31 +113,8 @@ exports.setupInstructionsHandlers = async (bot) => {
         delete ctx.session.isntructionCreation;
     });
 
-    bot.on(['photo', 'video'], async (ctx) => {
-        if (!ctx.session.isntructionCreation) return;
-
-        let fileId = 0;
-        let typeId = -1;
-
-        if (ctx.message.photo) {
-            fileId = ctx.message.photo[ctx.message.photo.length - 1].file_id;
-            typeId = callback_inst_type.callback_image;
-        }
-        else if (ctx.message.video) {
-            fileId = ctx.message.video.file_id;
-            typeId = callback_inst_type.callback_video;
-        }
-
-        const fileLink = await ctx.telegram.getFileLink(fileId);
-
-        const file = await apiService.get(fileLink, null, { responseType: 'arraybuffer' });
-        ctx.session.isntructionCreation.data.push({ typeId: typeId, content: file});
-
-        await ctx.reply(`Добавить ещё инструкцию или отправить уже созданные инструкции(${ctx.session.isntructionCreation.data.length})?`,
-            Markup.inlineKeyboard(
-                [Markup.button.callback('Добавить', 'Добавить'),
-                Markup.button.callback('Отправить', 'Отправить')]
-            )
-        )
+    bot.on(['photo', 'video', 'text'], async (ctx, next) => {
+        await handleInstructionsContent(ctx);
+        await next();
     });
 }

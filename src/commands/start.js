@@ -8,10 +8,10 @@ exports.handleStartCommand = async (ctx) => {
     ctx.session = {
         themes: [],
         currentThemeId: null,
-        contents: {},
+        contents: [],
         role: loginResponse.role
     }
-
+    console.log(ctx.session.themes);
     themes.handleTheme(ctx, null, 'Привет! Я помогу тебе разобраться, как всё устроено. Выбери нужную тему ниже:');
 }
 

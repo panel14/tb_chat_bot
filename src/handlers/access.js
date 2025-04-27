@@ -1,9 +1,11 @@
 const { Markup } = require("telegraf");
 const userService = require("../services/UserService/UserService");
+const themes = require('./themes');
 
 const getAccessKeyboard = async(ctx) => {
     await ctx.reply('Выдача доступа', 
-        Markup.keyboard([['Добавить пользователя', 'Обновить пользователя', 'Заблокировать/разблокировать пользователя'], ['Назад']])
+        Markup.keyboard([['Добавить пользователя', 'Обновить пользователя', 'Заблокировать/разблокировать пользователя'], 
+            ['Вернуться в главное меню']])
         .resize());
 }
 
@@ -94,6 +96,10 @@ exports.setupAccessHandlers = async (bot) => {
     bot.hears('Заблокировать/разблокировать пользователя', async (ctx) => {
         await handleBlockUser(ctx);
     });
+
+    bot.hears('Вернуться в главное меню', async (ctx) => {
+        themes.handleTheme(ctx, null, 'Вы вернулись в главное меню\n');
+    })
 
     bot.action(['Заблокировать', 'Разблокировать'], async (ctx) => {
         const isBlock = ctx.callbackQuery.data == 'Заблокировать';

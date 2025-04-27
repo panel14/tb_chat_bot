@@ -23,7 +23,7 @@ class ThemesService {
     async createTheme(createThemeRequest) {
 
         const data = await apiService.post('/theme/create', {
-            themeName: createThemeRequest.themeName,
+            themeName: createThemeRequest.name,
             description: createThemeRequest.description,
             parentId: createThemeRequest.parentId,
             accessLevel: createThemeRequest.accessLevel
@@ -35,7 +35,7 @@ class ThemesService {
     async updateTheme(updateThemeRequest) {
         const data = await apiService.post('/theme/update', {
             id: updateThemeRequest.id,
-            themeName: updateThemeRequest.themeName,
+            themeName: updateThemeRequest.name,
             description: updateThemeRequest.description,
             parentId: updateThemeRequest.parentId,
             accessLevel: updateThemeRequest.accessLevel

@@ -6,6 +6,8 @@ const instructions = require('./handlers/instructions');
 const feedback = require('./handlers/feedback');
 const positions = require('./handlers/positions');
 
+const access = require('./handlers/access');
+
 const errorMiddleware = require('./middlewares/ErrorMiddleware');
 
 const bot = new Telegraf(process.env.BOT_TOKEN);
@@ -19,6 +21,8 @@ instructions.setupInstructionsHandlers(bot);
 positions.setupPositionsHandlers(bot);
 feedback.setupFeedbackHandlers(bot);
 themes.setupThemesHandlers(bot);
+
+access.setupAccessHandlers(bot);
 
 bot.launch();
 

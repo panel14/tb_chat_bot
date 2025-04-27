@@ -26,7 +26,6 @@ httpClient.interceptors.response.use(
         return response.data;
     },
     (error) => {
-        console.log(error.response);
         if (error.response) {
             if (error.response?.status == 401 || error.response?.status == 403)
                 return Promise.reject(new AuthenticationError('Ошибка авторизации.', error.response.status));

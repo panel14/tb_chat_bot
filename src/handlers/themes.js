@@ -33,7 +33,7 @@ exports.handleTheme = async (ctx, themeId, message = null) => {
         
         if (ctx.session.role === 'ROLE_ADMIN') {
             keyboard.push(['Создать новую тему', 'Обновить текущую тему', 'Удалить текущую тему']);
-            keyboard.push(['Форма обратной связи'])
+            keyboard.push(['Форма обратной связи', 'Выдача доступа'])
         }
     }
 
@@ -105,24 +105,11 @@ handleThemeCreateOrUpdateMessage = async (ctx, data) => {
     const themeId = ctx.session.currentThemeId;
     switch (ctx.session.themeCreation.mode) {
         case 'create':
-            await themesService.createTheme(
-                {
-                    themeName: data.name,
-                    description: data.description,
-                    parentId: data.parentId,
-                    accessLevel: data.accessLevel
-                });
+            await themesService.createTheme(data);
             await ctx.reply('Тема успешно создана!');
             break;
         case 'update':
-            await themesService.updateTheme(
-                {
-                    id: themeId,
-                    themeName: data.name,
-                    description: data.description,
-                    parentId: data.parentId,
-                    accessLevel: data.accessLevel
-                });
+            await themesService.updateTheme(data);
             await ctx.reply('Тема успешно обновлена!');
             ctx.session.themes.find(th => th.id == themeId).name = data.name;
             break;

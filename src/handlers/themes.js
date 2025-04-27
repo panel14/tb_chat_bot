@@ -7,15 +7,16 @@ exports.handleTheme = async (ctx, themeId, message = null) => {
     const content = themesResponse;
 
     let keyboard = [];
-
     if (content.leaf) {
         content.instructions.forEach(instruction => {
-            ctx.contents[`${instruction.id}`] = {
+            ctx.session.contents[`${instruction.id}`] = {
                 content: instruction.content,
                 type: instruction.instructionType.id
             };
-            keyboard.push([Markup.button.callback(content.description, `instruction_${instruction.id}`)]);
+            keyboard.push([`Инструкция ${instruction.id}`]);
         });
+        if (ctx.session.role === 'ROLE_ADMIN')
+            keyboard.push(['Добавить новую инструкцию']);
     }
     else {
         content.children.forEach(theme => {
@@ -35,18 +36,16 @@ exports.handleTheme = async (ctx, themeId, message = null) => {
     }
 
     const currentTheme = ctx.session.themes.filter(th => th.id == themeId)[0];
-    let text = '';
+    let text = 'Выберите подтему:';
     if (currentTheme) {
         ctx.session.currentThemeId = themeId;
         keyboard.push(['Назад']);
-        text = `${currentTheme.name}:\n\n`;
+        text = `${currentTheme.name}:\n${content.description}\n`;
     }
 
     if (message) text = message;
     await ctx.reply(
-        `${text}Выберите подтему:`,
-        Markup.keyboard(keyboard)
-            .resize()
+        text, Markup.keyboard(keyboard).resize()
     );
 };
 

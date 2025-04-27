@@ -10,7 +10,6 @@ const callback_inst_type = {
 handleInstruction = async (ctx, instId) => {
     const content = ctx.session.contents[instId];
     const buffer = Buffer.from(content.content, 'base64');
-    console.log('Размер (МБ):', buffer.length / 1024 /1024);
     switch (content.type) {
         case 'STRING':
             await ctx.reply(buffer.toString('utf-8'))

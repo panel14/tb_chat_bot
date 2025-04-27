@@ -129,7 +129,7 @@ exports.setupPositionsHandlers = (bot) => {
         );
     });
 
-    bot.on('text', async (ctx) => {
+    bot.on('text', async (ctx, next) => {
         if (ctx.session?.awaitingPosition) {
             const { step, data } = ctx.session.awaitingPosition;
 
@@ -154,5 +154,6 @@ exports.setupPositionsHandlers = (bot) => {
                 await showPositionsMenu(ctx);
             }
         }
+        await next();
     });
 };

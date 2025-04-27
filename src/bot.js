@@ -17,12 +17,12 @@ bot.use(errorMiddleware);
 
 startCommand.setupStartHandlers(bot);
 
+access.setupAccessHandlers(bot);
 instructions.setupInstructionsHandlers(bot);
 feedback.setupFeedbackHandlers(bot);
 positions.setupPositionsHandlers(bot);
 themes.setupThemesHandlers(bot);
 
-access.setupAccessHandlers(bot);
 
 bot.launch();
 

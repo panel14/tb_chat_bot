@@ -57,30 +57,42 @@ const handleInstructionsContent = async (ctx) => {
     let typeId = -1;
 
     let content = null;
-    if (ctx.message.photo || ctx.message.video) {
-        if (ctx.message.photo) {
-            fileId = ctx.message.photo[ctx.message.photo.length - 1].file_id;
-            typeId = process.env.INSTRUCTIONS_CONTENT_MAPPING_IMAGE;
-        }
-        else if (ctx.message.video) {
-            fileId = ctx.message.video.file_id;
-            typeId = process.env.INSTRUCTIONS_CONTENT_MAPPING_VIDEO;
-        }
+    if (ctx.message.photo) {
+        fileId = ctx.message.photo[ctx.message.photo.length - 1].file_id;
+        typeId = process.env.INSTRUCTIONS_CONTENT_MAPPING_IMAGE;
+        const fileLink = await ctx.telegram.getFileLink(fileId);
+
+        content = await apiService.get(fileLink, null, { responseType: 'arraybuffer' });
+        ctx.session.isntructionCreation.data.push({ typeId: typeId, content: content});
+    }
+
+    if (ctx.message.video) {
+        fileId = ctx.message.video.file_id;
+        typeId = process.env.INSTRUCTIONS_CONTENT_MAPPING_VIDEO;
 
         const fileLink = await ctx.telegram.getFileLink(fileId);
 
         content = await apiService.get(fileLink, null, { responseType: 'arraybuffer' });
+        ctx.session.isntructionCreation.data.push({ typeId: typeId, content: content});
     }
-    else if (ctx.message.text) {
+
+    if (ctx.message.caption) {
+        typeId = process.env.INSTRUCTIONS_CONTENT_MAPPING_TEXT;
+        content = Buffer.from(ctx.message.caption, 'utf-8');
+        ctx.session.isntructionCreation.data.push({ typeId: typeId, content: content});
+    }
+
+    if (ctx.message.text) {
         typeId = process.env.INSTRUCTIONS_CONTENT_MAPPING_TEXT;
         content = Buffer.from(ctx.message.text, 'utf-8');
+        ctx.session.isntructionCreation.data.push({ typeId: typeId, content: content});
     }
-    ctx.session.isntructionCreation.data.push({ typeId: typeId, content: content});
 
     await ctx.reply(`Добавить ещё инструкцию или отправить уже созданные инструкции(${ctx.session.isntructionCreation.data.length})?`,
         Markup.inlineKeyboard(
             [Markup.button.callback('Добавить', 'Добавить'),
-            Markup.button.callback('Отправить', 'Отправить')]
+            Markup.button.callback('Отправить', 'Отправить'), 
+            Markup.button.callback('Отмена', 'Отмена')]
         )
     );
 } 
@@ -111,6 +123,12 @@ exports.setupInstructionsHandlers = async (bot) => {
         ctx.answerCbQuery();
         await ctx.reply('Инструкции успешно добавлены!');
         delete ctx.session.isntructionCreation;
+    });
+
+    bot.action('Отмена', async (ctx) => {
+        delete ctx.session.isntructionCreation;
+        await ctx.reply('Создание инструкций отменено.');
+        ctx.answerCbQuery();
     });
 
     bot.on(['photo', 'video', 'text'], async (ctx, next) => {

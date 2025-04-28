@@ -12,8 +12,8 @@ const errorMiddleware = require('./middlewares/ErrorMiddleware');
 
 const bot = new Telegraf(process.env.BOT_TOKEN);
 
-bot.use(session());
 bot.use(errorMiddleware);
+bot.use(session());
 
 startCommand.setupStartHandlers(bot);
 

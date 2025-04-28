@@ -35,7 +35,6 @@ exports.handleTheme = async (ctx, themeId, message = null) => {
     }
 
     const currentTheme = ctx.session.themes.find(th => th.id == themeId);
-    console.log(currentTheme);
     let isBack = false;
     let text = 'Выберите подтему:';
     if (currentTheme) {
@@ -55,7 +54,6 @@ exports.handleTheme = async (ctx, themeId, message = null) => {
         keyboard.push(crudKeys);
         keyboard.push(['Должности', 'Форма обратной связи', 'Выдача доступа'])
     }
-    console.log(isBack);
     if (isBack)
         keyboard.push(['Назад']);
 

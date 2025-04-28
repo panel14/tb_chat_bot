@@ -1,6 +1,7 @@
 const { Markup } = require("telegraf");
 const userService = require("../services/UserService/UserService");
 const themes = require('./themes');
+const ValidationError = require('../middlewares/errors/Errors');
 
 const getAccessKeyboard = async(ctx) => {
     await ctx.reply('Выдача доступа', 
@@ -10,7 +11,7 @@ const getAccessKeyboard = async(ctx) => {
 }
 
 const createOrUpdateUserDialog = async (ctx) => {
-    if (ctx.session.userCreation) {
+    if (ctx.session?.userCreation) {
         const {step, data} = ctx.session.userCreation;
         switch (step) {
             case 'id':
@@ -40,7 +41,7 @@ const createOrUpdateUserDialog = async (ctx) => {
                 break;
         }
     }
-    else if (ctx.session.userBlock) {
+    else if (ctx.session?.userBlock) {
         if (!ctx.message.text || isNaN(ctx.message.text))
             throw new ValidationError('ID пользователя должен быть числом');
         ctx.session.userBlock.id = parseInt(ctx.message.text);

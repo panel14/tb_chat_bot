@@ -24,8 +24,12 @@ class QuestionService {
         return response;
     }
 
-    async getForAnswer() {
-        const response = await apiService.get(`${this.baseUrl}/getForAnswer`);
+    async getForAnswer(tgId) {
+        const response = await apiService.post(`${this.baseUrl}/getForAnswer`, `${tgId}`, {
+            headers: {
+                'Content-Type': 'text/plain'
+            }
+        });
         return response;
     }
 

@@ -28,7 +28,7 @@ httpClient.interceptors.response.use(
     (error) => {
         if (error.response) {
             if (error.response?.status == 401 || error.response?.status == 403)
-                return Promise.reject(new AuthenticationError('Ошибка авторизации.', error.response.status));
+                return Promise.reject(new AuthenticationError('Ошибка авторизации. ' + error.response?.data?.error, error.response.status));
             return Promise.reject(
                 new ApiError(
                     error.response.data?.message || 'Ошибка сервера.',

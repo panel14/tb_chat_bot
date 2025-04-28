@@ -68,7 +68,7 @@ const handleQuestionCreation = async (ctx) => {
 }
 
 const handleAnswerQuestion = async (ctx) => {
-    const questions = await questionService.getForAnswer();
+    const questions = await questionService.getForAnswer(ctx.from.id);
     if (questions.length === 0) {
         await ctx.reply('Нет вопросов для ответа.');
         return;
